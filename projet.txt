@@ -1,0 +1,2 @@
+projet : 
+faire tourner le projet recuperer en local via docker
