@@ -1,2 +1,38 @@
-projet : 
-faire tourner le projet recuperer en local via docker
+projet à realiser :
+dans le dossier dolibarr2021.agoralogie.fr, il  y a les éléments pour faire fonctionner un site web dolibarr, un dossier source php, un dossier document, et un dump sql ( de mysql)
+je désire faire tourner le projet recuperer en local via docker, en y incluant le code php 7.4, en gardant le repertoire de documents et le repertoire avec les fichiers base de données en dehors, 
+comme sous-repertoire d'un dossier /home/agoralogie/Nextcloud/Documents/Administration_agoralogie/dolibarr21
+
+créer moi un dossier dockerfile dans lequel je pourrai faire un docker-compose, et les scripts pour initialiser le projet
+
+Réponse de Claude : 
+J'ai créé la structure Docker complète. Voici le résumé :
+Structure créée dans dockerfile/
+
+dockerfile/
+├── docker-compose.yml    # 3 services : Dolibarr, MySQL, phpMyAdmin
+├── Dockerfile            # PHP 7.4 avec Apache et extensions Dolibarr
+├── init.sh               # Script d'initialisation
+├── init-db/
+│   └── 01-init.sql       # Dump SQL copié
+├── .env                  # Configuration (mots de passe à modifier)
+├── .env.example          # Exemple de configuration
+├── .gitignore
+└── README.md
+Pour démarrer le projet
+Initialiser :
+
+cd dockerfile
+./init.sh
+Modifier les mots de passe dans .env
+Lancer Docker :
+
+docker-compose up -d
+Accès
+Dolibarr : http://localhost:8080
+phpMyAdmin : http://localhost:8081
+Volumes persistants
+Les données seront stockées dans :
+/home/agoralogie/Nextcloud/Documents/Administration_agoralogie/dolibarr21/documents
+/home/agoralogie/Nextcloud/Documents/Administration_agoralogie/dolibarr21/mysql_data
+Important : Après le premier démarrage, vous devrez peut-être ajuster le fichier conf.php de Dolibarr pour utiliser db comme hôte MySQL.

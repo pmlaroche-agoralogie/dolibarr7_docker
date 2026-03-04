@@ -1,0 +1,5 @@
+# Fichier de configuration local
+.env
+
+# Ne pas versionner les données
+mysql_data/

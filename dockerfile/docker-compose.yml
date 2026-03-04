@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  dolibarr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dolibarr_app
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      # Code source PHP
+      - ../dolibarr2021.agoralogie.fr/public_html:/var/www/html
+      # Documents Dolibarr (stockés en dehors du conteneur)
+      - /home/agoralogie/Nextcloud/Documents/Administration_agoralogie/dolibarr21/documents:/var/www/html/documents
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-dolibarr}
+      - MYSQL_USER=${MYSQL_USER:-dolibarr}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-dolibarr_password}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - dolibarr_network
+
+  db:
+    image: mysql:5.7
+    container_name: dolibarr_db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root_password}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-dolibarr}
+      - MYSQL_USER=${MYSQL_USER:-dolibarr}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-dolibarr_password}
+    volumes:
+      # Données MySQL (stockées en dehors du conteneur)
+      - /home/agoralogie/Nextcloud/Documents/Administration_agoralogie/dolibarr21/mysql_data:/var/lib/mysql
+      # Script d'initialisation
+      - ./init-db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root_password}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dolibarr_network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: dolibarr_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_HOST=db
+      - PMA_USER=${MYSQL_USER:-dolibarr}
+      - PMA_PASSWORD=${MYSQL_PASSWORD:-dolibarr_password}
+    depends_on:
+      - db
+    networks:
+      - dolibarr_network
+
+networks:
+  dolibarr_network:
+    driver: bridge
