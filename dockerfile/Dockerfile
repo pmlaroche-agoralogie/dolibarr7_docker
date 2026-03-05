@@ -1,4 +1,11 @@
-FROM php:7.4-apache
+FROM php:7.2-apache
+
+# Utiliser les archives Debian pour Buster (plus maintenu)
+RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list \
+    && sed -i 's/security.debian.org/archive.debian.org/g' /etc/apt/sources.list \
+    && sed -i 's|archive.debian.org/debian-security|archive.debian.org/debian-security|g' /etc/apt/sources.list \
+    && sed -i '/buster-updates/d' /etc/apt/sources.list \
+    && echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
 
 # Installation des extensions PHP nécessaires pour Dolibarr
 RUN apt-get update && apt-get install -y \
@@ -10,13 +17,12 @@ RUN apt-get update && apt-get install -y \
     libldap2-dev \
     libxml2-dev \
     libcurl4-openssl-dev \
-    libonig-dev \
     zlib1g-dev \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
 # Configuration et installation des extensions PHP
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr --with-jpeg-dir=/usr \
     && docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ \
     && docker-php-ext-install -j$(nproc) \
         gd \

@@ -1,6 +1,6 @@
 # Dolibarr Docker Setup
 
-Configuration Docker pour faire tourner Dolibarr 7.0 en local avec PHP 7.4.
+Configuration Docker pour faire tourner Dolibarr 7.0 en local avec PHP 7.2.
 
 ## Structure
 
